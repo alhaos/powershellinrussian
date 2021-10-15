@@ -34,7 +34,7 @@ $units = @{
 $ApiCall = "http://api.openweathermap.org/data/2.5/forecast?$CityParam&units=$($units[$TemperatureFormat])&appid=$APIKey&cnt=9" 
 $Result  = (Invoke-WebRequest $ApiCall) | convertfrom-json
 
-$out = @{
+$out = [ordered]@{
     City = $Result.city.name
     Id = $Result.city.id
     Country = $Result.city.country
