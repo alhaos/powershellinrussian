@@ -12,7 +12,7 @@ param (
     [ValidateLength(1,30)]
     [string]$CityNameOrName = 'London',
     [Parameter (Mandatory=$true)]
-    [ValidateSet("standard", "metric", "imperial")]
+    [ValidateSet("Kelvin","Imperial","Metric")]
     [string]$TemperatureFormat = "metric",
     [Parameter (Mandatory=$true)]
     [string]$APIKey = "001abf212cdee8941b71ff7eb93a05b1"
@@ -25,8 +25,23 @@ else {
     $CityParam = "q=$CityNameOrName"
 }
 
-$ApiCall = "http://api.openweathermap.org/data/2.5/weather?$CityParam&units=$TemperatureFormat&appid=$APIKey"
-$Result  = (Invoke-WebRequest $ApiCall).Content
-$Result
+$units = @{
+    "Kelvin" = "standard"
+    "Imperial" = "imperial"
+    "Metric" = "metric"
+}
 
+$ApiCall = "http://api.openweathermap.org/data/2.5/forecast?$CityParam&units=$($units[$TemperatureFormat])&appid=$APIKey&cnt=9" 
+$Result  = (Invoke-WebRequest $ApiCall) | convertfrom-json
 
+$out = @{
+    City = $Result.city.name
+    Id = $Result.city.id
+    Country = $Result.city.country
+    "Weather Now" = $Result.list[0].weather
+    "Temperature Now" = $Result.list[0].main.temp
+    "Weather Tomorrow" = $Result.list[-1].weather
+    "Temperature Tomorrow" = $Result.list[-1].main.temp
+}
+
+$out
