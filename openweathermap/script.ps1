@@ -1,38 +1,32 @@
 <#
         .SYNOPSIS
-        Adds a file name extension to a supplied name.
+        Write a script for retrieving weather data from openweathermap.org.
+        2. Script is required getting data by city name or city id.
+        3. Script is required having possibility to set temperature format (Kelvin, Imperial, Metric).
+        4. Script must return hash table with next keys: City, Id, Country, Weather Now, Temperature Now, Weather Tomorrow, Temperature Tomorrow.
+        
+#>
 
-        .DESCRIPTION
-        Adds a file name extension to a supplied name.
-        Takes any strings for the file name or extension.
+param (
+    [Parameter (Mandatory=$true)]
+    [ValidateLength(1,30)]
+    [string]$CityNameOrName = 'London',
+    [Parameter (Mandatory=$true)]
+    [ValidateSet("standard", "metric", "imperial")]
+    [string]$TemperatureFormat = "metric",
+    [Parameter (Mandatory=$true)]
+    [string]$APIKey = "001abf212cdee8941b71ff7eb93a05b1"
+)
 
-        .PARAMETER Name
-        Specifies the file name.
+if ($CityNameOrName -match "/d+"){
+    $CityParam = "id=$CityNameOrName"
+}
+else {
+    $CityParam = "q=$CityNameOrName"
+}
 
-        .PARAMETER Extension
-        Specifies the extension. "Txt" is the default.
+$ApiCall = "http://api.openweathermap.org/data/2.5/weather?$CityParam&units=$TemperatureFormat&appid=$APIKey"
+$Result  = (Invoke-WebRequest $ApiCall).Content
+$Result
 
-        .INPUTS
-        None. You cannot pipe objects to Add-Extension.
 
-        .OUTPUTS
-        System.String. Add-Extension returns a string with the extension or file name.
-
-        .EXAMPLE
-        PS> extension -name "File"
-        File.txt
-
-        .EXAMPLE
-        PS> extension -name "File" -extension "doc"
-        File.doc
-
-        .EXAMPLE
-        PS> extension "File" "doc"
-        File.doc
-
-        .LINK
-        Online version: http://www.fabrikam.com/extension.html
-
-        .LINK
-        Set-Item
-    #>
