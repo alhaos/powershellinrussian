@@ -18,7 +18,7 @@ param (
     [string]$APIKey = "001abf212cdee8941b71ff7eb93a05b1"
 )
 
-if ($CityNameOrName -match "/d+"){
+if ($CityNameOrName -match "\d+"){
     $CityParam = "id=$CityNameOrName"
 }
 else {
